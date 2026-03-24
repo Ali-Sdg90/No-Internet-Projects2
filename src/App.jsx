@@ -7,7 +7,7 @@ const App = () => {
 
     return (
         <div className="app-container">
-            <h1>No Internet Project - Sea Battle React</h1>
+            <h1 className="app-header">No Internet Project - Sea Battle React</h1>
 
             <AppRoute />
         </div>

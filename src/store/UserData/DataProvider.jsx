@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { UserDataContext } from "./DataContext";
-
-const groundSize = 10;
+import { baseSize } from "../../constants/config";
 
 export const DataProvider = ({ children }) => {
     const [userGround, setUserGround] = useState(() => {
         const ground = [];
-        for (let i = 0; i < groundSize; i++) {
-            ground[i] = Array(groundSize)
+        for (let i = 0; i < baseSize; i++) {
+            ground[i] = Array(baseSize)
                 .fill()
                 .map(() => {
                     return [0];

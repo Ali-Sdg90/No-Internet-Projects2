@@ -1,0 +1,35 @@
+.showcase-base {
+    border: 4px solid rgb(0, 0, 0);
+    border-radius: 8px;
+    width: 600px;
+    height: 600px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .base-row {
+        height: 100%;
+        display: flex;
+
+        div {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.water-tile {
+    border: 1px solid blue;
+    background-color: rgb(69, 69, 255);
+}
+
+.ship-tile {
+    border: 1px solid rgb(40, 40, 40);
+    background-color: rgb(35, 35, 35);
+}
+
+.border-tile{
+    border: 1px solid rgb(40, 40, 40);
+    background-color: rgb(200, 200, 200);
+}
