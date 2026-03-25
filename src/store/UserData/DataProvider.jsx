@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { UserDataContext } from "./DataContext";
-import { baseSize } from "../../constants/config";
+import { createEmptyGround } from "../../utils/createEmptyGround";
 
 export const DataProvider = ({ children }) => {
-    const [userGround, setUserGround] = useState(() => {
-        const ground = [];
-        for (let i = 0; i < baseSize; i++) {
-            ground[i] = Array(baseSize)
-                .fill()
-                .map(() => {
-                    return [0];
-                });
-        }
-        return ground;
-    });
+    const [userGround, setUserGround] = useState(createEmptyGround());
 
     useEffect(() => {
         if (userGround) {
@@ -24,12 +14,6 @@ export const DataProvider = ({ children }) => {
                     .replace("[[[", "[\n[[")
                     .replace("]]]", "]]\n]")
             );
-        } else if (false) {
-            setUserGround([
-                [[0], [0], [0]],
-                [[0], [0], [0]],
-                [[0], [0], [0]],
-            ]);
         }
     }, [userGround]);
 

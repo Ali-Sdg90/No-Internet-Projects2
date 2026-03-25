@@ -1,28 +1,26 @@
 import { useContext, useEffect } from "react";
 import { UserDataContext } from "../store/UserData/DataContext";
 import { baseSize } from "../constants/config";
+import { getRandomNumber } from "../utils/getRandomNumber";
+import { createEmptyGround } from "../utils/createEmptyGround";
 
-const baseArray = [];
+const baseArrays = [];
 
 const CreateBasePage = () => {
     const { userGround, setUserGround } = useContext(UserDataContext);
 
-    const getRandomNumber = (min, max) => {
-        return min + Math.floor(Math.random() * (max - min));
-    };
-
+    // Creates new seed with random x, y and direction
     const replantSeed = (sizeOfShip) => {
         const shipSeed_i = getRandomNumber(0, baseSize - sizeOfShip);
         const shipSeed_j = getRandomNumber(0, baseSize - sizeOfShip);
+        const shipSeed_dir = getRandomNumber(0, 2);
 
         // console.log(shipSeed_i, shipSeed_j);
-        // console.log(sizeOfShip, baseSize - sizeOfShip);
-
-        const shipSeed_dir = getRandomNumber(0, 2);
 
         return [shipSeed_i, shipSeed_j, shipSeed_dir];
     };
 
+    // After a location is found to be okay to place the ship, add shadow to the water around the ship tile
     const addWaterShadow = (newBase, ship_i, ship_j) => {
         for (let shadowIteration = 0; shadowIteration < 9; shadowIteration++) {
             const x = ship_i + Math.floor(shadowIteration / 3) - 1;
@@ -36,22 +34,21 @@ const CreateBasePage = () => {
             ) {
                 const currentItem = newBase[x][y];
 
-                // console.log(`x: ${x}, y: ${y}, currentItem:`, currentItem);
-
                 if (
                     Array.isArray(currentItem) &&
                     currentItem.toString() !== "0"
                 ) {
                     continue;
                 } else {
-                    newBase[x][y] = [2];
+                    newBase[x][y] = [2]; // "2" is for shadows around ship tile
                 }
             }
         }
         return newBase;
     };
 
-    const checkNeighbors = (ship_i, ship_j, shipTile, newBase) => {
+    // Around the selected tile, there must not be any ship; if so, the tile will be okay to continue
+    const checkNeighbors = (ship_i, ship_j, newBase) => {
         let numberOf_1_s = 0;
 
         for (let radarIteration = 0; radarIteration < 9; radarIteration++) {
@@ -81,9 +78,7 @@ const CreateBasePage = () => {
             }
         }
 
-        console.log(">>>>", ship_i, ship_j, numberOf_1_s);
-
-        // debugger;
+        // console.log("CheckNeighbors Process>>", ship_i, ship_j, numberOf_1_s);
 
         if (numberOf_1_s === 0) {
             return false;
@@ -98,17 +93,11 @@ const CreateBasePage = () => {
             let numberOfShip = 0;
             let sizeOfShip = 5;
 
-            let newBase = userGround;
+            let newBase = createEmptyGround();
 
-            while (shipConstructionIteration < 4) {
-                ++shipConstructionIteration;
-                // console.log(
-                //     "shipConstructionIteration >>",
-                //     ++shipConstructionIteration
-                // );
-
-                sizeOfShip -= 1;
-                numberOfShip += 1;
+            while (shipConstructionIteration++ < 4) {
+                sizeOfShip -= 1; // 4 to 1
+                numberOfShip += 1; // 1 to 4
 
                 console.log("-------", "Ship Size >>", sizeOfShip);
 
@@ -116,12 +105,15 @@ const CreateBasePage = () => {
                     .fill()
                     .forEach((_) => {
                         let isShipSeedOk = false;
+                        let maxRetries = 100;
+                        let retries = 0;
 
                         let shipSeed_i = null;
                         let shipSeed_j = null;
                         let shipSeed_dir = null;
 
-                        while (!isShipSeedOk) {
+                        // Check if the ship is okay to place on the ground or not
+                        while (!isShipSeedOk && retries++ < maxRetries) {
                             isShipSeedOk = false;
 
                             [shipSeed_i, shipSeed_j, shipSeed_dir] =
@@ -141,18 +133,13 @@ const CreateBasePage = () => {
                                     current_j = shipSeed_j;
                                 }
 
-                                // console.log(current_i, current_j);
-                                // debugger;
-
                                 if (
                                     checkNeighbors(
                                         current_i,
                                         current_j,
-                                        shipTile,
                                         newBase
                                     )
                                 ) {
-                                    // BAD SEED
                                     console.log(
                                         "BAD SEED >>",
                                         current_i,
@@ -163,10 +150,22 @@ const CreateBasePage = () => {
                                     seedPoint++;
                                 }
 
+                                // if all tiles of the ship pass the checkNeighbors function
+                                // and the score of the ship is equal to the ship size, it means
+                                // all tiles of the ship are okay and it can go out of the
+                                // loop and be placed on the ground
                                 if (seedPoint === sizeOfShip) {
                                     isShipSeedOk = true;
                                 }
                             }
+                        }
+
+                        if (retries >= maxRetries) {
+                            console.log(
+                                "Max retries reached for ship size",
+                                sizeOfShip
+                            );
+                            return;
                         }
 
                         console.log(
@@ -176,32 +175,25 @@ const CreateBasePage = () => {
                             shipSeed_dir
                         );
 
-                        // Add ship to base state
-
+                        // Add the ships to the newBase
                         for (
                             let shipTile = 0;
                             shipTile < sizeOfShip;
                             shipTile++
                         ) {
+                            let current_i = shipSeed_i;
+                            let current_j = shipSeed_j + shipTile;
                             if (shipSeed_dir) {
-                                newBase[shipSeed_i + shipTile][shipSeed_j] = [
-                                    1,
-                                ]; // Vertical
-                                newBase = addWaterShadow(
-                                    newBase,
-                                    shipSeed_i + shipTile,
-                                    shipSeed_j
-                                );
-                            } else {
-                                newBase[shipSeed_i][shipSeed_j + shipTile] = [
-                                    1,
-                                ]; // Horizontal
-                                newBase = addWaterShadow(
-                                    newBase,
-                                    shipSeed_i,
-                                    shipSeed_j + shipTile
-                                );
+                                current_i = shipSeed_i + shipTile;
+                                current_j = shipSeed_j;
                             }
+
+                            newBase[current_i][current_j] = [1];
+                            newBase = addWaterShadow(
+                                newBase,
+                                current_i,
+                                current_j
+                            );
 
                             // debugger;
 
@@ -217,34 +209,12 @@ const CreateBasePage = () => {
                     });
             }
 
-            console.log("newBase >>", newBase);
-            console.log("USERGROUND >>", userGround);
-
-            // debugger;
+            // Create a shallow copy of the newBase and place it in the setUserGround state
             newBase = [...newBase];
             setUserGround(newBase);
         };
         createBase();
     }, []);
-
-    // useEffect(() => {
-    //     if (userGround) {
-    //         console.log(
-    //             ">> USER GROUND:",
-    //             JSON.stringify(userGround)
-    //                 .replaceAll("[[", "\n[[")
-    //                 .replace("[[[", "[\n[[")
-    //                 .replace("]]]", "]]\n]")
-    //                 .replaceAll("0", " ")
-    //         );
-    //     }
-    // }, [userGround]);
-
-    // useEffect(() => {
-    //     if (userGround) {
-    //         baseArray.push(userGround);
-    //     }
-    // }, [userGround]);
 
     return (
         <div>
@@ -268,7 +238,12 @@ const CreateBasePage = () => {
                                           ) : (
                                               <div
                                                   key={index}
-                                                  className="border-tile"
+                                                  className={
+                                                      // For Testing
+                                                      true
+                                                          ? "border-tile"
+                                                          : "water-tile"
+                                                  }
                                               ></div>
                                           );
                                       }
