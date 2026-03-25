@@ -24,22 +24,17 @@ const CreateBasePage = () => {
     };
 
     const addWaterShadow = (newBase, ship_i, ship_j) => {
-        // const copyOfNewBase = newBase;
-        let copyOfNewBase = JSON.parse(JSON.stringify(newBase));
-
-        // debugger;
-
         for (let shadowIteration = 0; shadowIteration < 9; shadowIteration++) {
             const x = ship_i + Math.floor(shadowIteration / 3) - 1;
             const y = ship_j + (shadowIteration % 3) - 1;
 
             if (
                 x >= 0 &&
-                x < copyOfNewBase.length &&
+                x < newBase.length &&
                 y >= 0 &&
-                y < (copyOfNewBase[x] ? copyOfNewBase[x].length : 0)
+                y < (newBase[x] ? newBase[x].length : 0)
             ) {
-                const currentItem = copyOfNewBase[x][y];
+                const currentItem = newBase[x][y];
 
                 // console.log(`x: ${x}, y: ${y}, currentItem:`, currentItem);
 
@@ -49,33 +44,27 @@ const CreateBasePage = () => {
                 ) {
                     continue;
                 } else {
-                    copyOfNewBase[x][y] = [2];
+                    newBase[x][y] = [2];
                 }
             }
         }
-        return copyOfNewBase;
+        return newBase;
     };
 
-    const checkNeighbors = (ship_i, ship_j, shipTile) => {
-        if (shipTile === 0) {
-            return false;
-        }
-
-        const copyOfNewBase = userGround;
-
-        let numberOf_0_s = 9;
+    const checkNeighbors = (ship_i, ship_j, shipTile, newBase) => {
+        let numberOf_1_s = 0;
 
         for (let radarIteration = 0; radarIteration < 9; radarIteration++) {
             const x = ship_i + Math.floor(radarIteration / 3) - 1;
-            const y = ship_j + (radarIteration % 3) - 1;
+            const y = ship_j + Math.floor(radarIteration % 3) - 1;
 
             if (
                 x >= 0 &&
-                x < copyOfNewBase.length &&
+                x < newBase.length &&
                 y >= 0 &&
-                y < (copyOfNewBase[x] ? copyOfNewBase[x].length : 0)
+                y < (newBase[x] ? newBase[x].length : 0)
             ) {
-                const currentItem = copyOfNewBase[x][y];
+                const currentItem = newBase[x][y];
 
                 // console.log(
                 //     `x: ${x}, y: ${y}, currentItem:`,
@@ -86,17 +75,17 @@ const CreateBasePage = () => {
                     continue;
                 }
 
-                if (currentItem.toString() === "0") {
-                    numberOf_0_s--;
+                if (currentItem.toString() === "1") {
+                    numberOf_1_s++;
                 }
             }
         }
 
-        console.log(">>>>", ship_i, ship_j, numberOf_0_s);
+        console.log(">>>>", ship_i, ship_j, numberOf_1_s);
 
         // debugger;
 
-        if (numberOf_0_s === 0) {
+        if (numberOf_1_s === 0) {
             return false;
         } else {
             return true;
@@ -108,6 +97,8 @@ const CreateBasePage = () => {
             let shipConstructionIteration = 0;
             let numberOfShip = 0;
             let sizeOfShip = 5;
+
+            let newBase = userGround;
 
             while (shipConstructionIteration < 4) {
                 ++shipConstructionIteration;
@@ -151,14 +142,14 @@ const CreateBasePage = () => {
                                 }
 
                                 // console.log(current_i, current_j);
-
                                 // debugger;
 
                                 if (
                                     checkNeighbors(
                                         current_i,
                                         current_j,
-                                        shipTile
+                                        shipTile,
+                                        newBase
                                     )
                                 ) {
                                     // BAD SEED
@@ -185,58 +176,69 @@ const CreateBasePage = () => {
                             shipSeed_dir
                         );
 
+                        // Add ship to base state
+
                         for (
                             let shipTile = 0;
                             shipTile < sizeOfShip;
                             shipTile++
                         ) {
-                            setUserGround((prevState) => {
-                                // let newBase = [...prevState];
-                                let newBase = JSON.parse(
-                                    JSON.stringify(prevState)
+                            if (shipSeed_dir) {
+                                newBase[shipSeed_i + shipTile][shipSeed_j] = [
+                                    1,
+                                ]; // Vertical
+                                newBase = addWaterShadow(
+                                    newBase,
+                                    shipSeed_i + shipTile,
+                                    shipSeed_j
                                 );
+                            } else {
+                                newBase[shipSeed_i][shipSeed_j + shipTile] = [
+                                    1,
+                                ]; // Horizontal
+                                newBase = addWaterShadow(
+                                    newBase,
+                                    shipSeed_i,
+                                    shipSeed_j + shipTile
+                                );
+                            }
 
-                                if (shipSeed_dir) {
-                                    newBase[shipSeed_i + shipTile][shipSeed_j] =
-                                        [1]; // Vertical
-                                    newBase = addWaterShadow(
-                                        newBase,
-                                        shipSeed_i + shipTile,
-                                        shipSeed_j
-                                    );
-                                } else {
-                                    newBase[shipSeed_i][shipSeed_j + shipTile] =
-                                        [1]; // Horizontal
-                                    newBase = addWaterShadow(
-                                        newBase,
-                                        shipSeed_i,
-                                        shipSeed_j + shipTile
-                                    );
-                                }
+                            // debugger;
 
-                                return newBase;
-                            });
-
-                            debugger;
+                            // console.log(
+                            //     ">> USER GROUND:",
+                            //     JSON.stringify(newBase)
+                            //         .replaceAll("[[", "\n[[")
+                            //         .replace("[[[", "[\n[[")
+                            //         .replace("]]]", "]]\n]")
+                            //         .replaceAll("0", " ")
+                            // );
                         }
                     });
             }
+
+            console.log("newBase >>", newBase);
+            console.log("USERGROUND >>", userGround);
+
+            // debugger;
+            newBase = [...newBase];
+            setUserGround(newBase);
         };
         createBase();
     }, []);
 
-    useEffect(() => {
-        if (userGround) {
-            console.log(
-                ">> USER GROUND:",
-                JSON.stringify(userGround)
-                    .replaceAll("[[", "\n[[")
-                    .replace("[[[", "[\n[[")
-                    .replace("]]]", "]]\n]")
-                    .replaceAll("0", " ")
-            );
-        }
-    }, [userGround]);
+    // useEffect(() => {
+    //     if (userGround) {
+    //         console.log(
+    //             ">> USER GROUND:",
+    //             JSON.stringify(userGround)
+    //                 .replaceAll("[[", "\n[[")
+    //                 .replace("[[[", "[\n[[")
+    //                 .replace("]]]", "]]\n]")
+    //                 .replaceAll("0", " ")
+    //         );
+    //     }
+    // }, [userGround]);
 
     // useEffect(() => {
     //     if (userGround) {
