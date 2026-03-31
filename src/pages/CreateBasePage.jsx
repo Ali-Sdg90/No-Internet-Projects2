@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserDataContext } from "../store/UserData/DataContext";
 import { baseSize } from "../constants/config";
 import { getRandomNumber } from "../utils/getRandomNumber";
@@ -7,7 +7,8 @@ import { createEmptyGround } from "../utils/createEmptyGround";
 const baseArrays = [];
 
 const CreateBasePage = () => {
-    const { userGround, setUserGround } = useContext(UserDataContext);
+    // const { userGround, setUserGround } = useContext(UserDataContext);
+    const [showBaseIndex, setShowBaseIndex] = useState(-1);
 
     // Creates new seed with random x, y and direction
     const replantSeed = (sizeOfShip) => {
@@ -211,47 +212,94 @@ const CreateBasePage = () => {
 
             // Create a shallow copy of the newBase and place it in the setUserGround state
             newBase = [...newBase];
-            setUserGround(newBase);
+            // setUserGround(newBase);
+            baseArrays.push(newBase);
         };
-        createBase();
+
+        Array(5)
+            .fill()
+            .forEach(() => createBase());
+
+        setShowBaseIndex(2);
+
+        // console.log("===>", baseArrays);
     }, []);
 
     return (
         <div>
-            <div className="showcase-base">
-                {userGround?.length
-                    ? userGround.map((i, index) => {
-                          return (
-                              <div key={index} className="base-row">
-                                  {i.map((j, index) => {
-                                      {
-                                          return j.toString() === "1" ? (
-                                              <div
-                                                  key={index}
-                                                  className="ship-tile"
-                                              ></div>
-                                          ) : j.toString() === "0" ? (
-                                              <div
-                                                  key={index}
-                                                  className="water-tile"
-                                              ></div>
-                                          ) : (
-                                              <div
-                                                  key={index}
-                                                  className={
-                                                      // For Testing
-                                                      true
-                                                          ? "border-tile"
-                                                          : "water-tile"
+            <div className="page-elements">
+                {baseArrays?.length > 0 ? (
+                    <>
+                        <div className="showcase-base">
+                            {showBaseIndex !== -1
+                                ? baseArrays[showBaseIndex].map((i, index) => {
+                                      return (
+                                          <div key={index} className="base-row">
+                                              {i.map((j, index) => {
+                                                  {
+                                                      return j.toString() ===
+                                                          "1" ? (
+                                                          <div
+                                                              key={index}
+                                                              className="ship-tile"
+                                                          ></div>
+                                                      ) : j.toString() ===
+                                                        "0" ? (
+                                                          <div
+                                                              key={index}
+                                                              className="water-tile"
+                                                          ></div>
+                                                      ) : (
+                                                          <div
+                                                              key={index}
+                                                              className={
+                                                                  // For Testing
+                                                                  true
+                                                                      ? "border-tile"
+                                                                      : "water-tile"
+                                                              }
+                                                          ></div>
+                                                      );
                                                   }
-                                              ></div>
-                                          );
-                                      }
-                                  })}
-                              </div>
-                          );
-                      })
-                    : "Loading..."}
+                                              })}
+                                          </div>
+                                      );
+                                  })
+                                : "Loading..."}
+                        </div>
+                        <div>
+                            <div
+                                className="prev-arrow"
+                                onClick={() =>
+                                    showBaseIndex > 0
+                                        ? setShowBaseIndex(
+                                              (prevState) => prevState - 1
+                                          )
+                                        : null
+                                }
+                            >
+                                {"<"}
+                            </div>
+                            <div className="base-index">
+                                {showBaseIndex + 1}
+                            </div>
+                            <div
+                                className="next-arrow"
+                                onClick={() =>
+                                    showBaseIndex < baseArrays.length - 1
+                                        ? setShowBaseIndex(
+                                              (prevState) => prevState + 1
+                                          )
+                                        : null
+                                }
+                            >
+                                {">"}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div>Loading...</div>
+                )}
             </div>
         </div>
     );
