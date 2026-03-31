@@ -1,0 +1,59 @@
+.base-navigator {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+
+    .navigator-switcher {
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        .base-bubbles {
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+
+            .base-bubble {
+                border: 1px solid rgb(99, 99, 99);
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: unset;
+                transition: background-color 0.3s 0.1s !important;
+                cursor: pointer;
+            }
+
+            .active-bubble {
+                transition: background-color 0.15s !important;
+                background-color: rgb(174, 174, 174);
+            }
+        }
+
+        .prev-arrow,
+        .next-arrow {
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            transition: color 0.2s !important;
+        }
+
+        .disabled-arrow {
+            color: rgb(150, 150, 150);
+        }
+    }
+
+    .base-index {
+        font-size: 14px;
+    }
+}

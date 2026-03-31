@@ -5,13 +5,16 @@ const HomePage = () => {
     const { setGameLocation } = useContext(GameDataContext);
 
     return (
-        <div>
-            <h1>Welcome to Sea Battle React :)</h1>
-            <h2>This app was made in 1405/01/04.</h2>
+        <div className="home-page">
+            <h1>Welcome to the Sea Battle React :)</h1>
+            <h2>This app was made on 1405/01/04.</h2>
             <h2>Day 24 of IRAN vs USA & ISRAEL War while internet was down.</h2>
             <h2>Good Luck ♡</h2>
 
-            <button onClick={() => setGameLocation("CreateBase")}>
+            <button
+                className="start-game-btn"
+                onClick={() => setGameLocation("CreateBase")}
+            >
                 Start Game
             </button>
         </div>

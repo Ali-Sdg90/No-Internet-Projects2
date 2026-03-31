@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { GameDataContext } from "./DataContext";
 
-// const defaultLocation = "HomePage"
-const defaultLocation = "CreateBase";
+const defaultLocation = "HomePage"
+// const defaultLocation = "CreateBase";
 
 export const DataProvider = ({ children }) => {
     const [gameLocation, setGameLocation] = useState(defaultLocation);

@@ -29,7 +29,53 @@
     background-color: rgb(35, 35, 35);
 }
 
-.border-tile{
+.border-tile {
     border: 1px solid rgb(40, 40, 40);
     background-color: rgb(200, 200, 200);
+}
+
+.component-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+
+    div {
+        border: 1px solid black;
+        background-color: rgb(76, 76, 76);
+        border-radius: 6px;
+        height: 40px;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition:
+            background-color 0.2s,
+            transform 0.1s !important;
+        user-select: none;
+
+        &:hover {
+            background-color: rgb(85, 85, 85);
+        }
+
+        &:active {
+            background-color: rgb(76, 76, 76);
+            transform: translateY(1px);
+        }
+    }
+
+    .confirm-base {
+        background-color: rgb(72, 72, 139);
+
+        &:hover {
+            background-color: rgb(80, 80, 155);
+        }
+
+        &:active {
+            background-color: rgb(72, 72, 139);
+        }
+    }
 }
